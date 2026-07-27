@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
@@ -87,6 +88,7 @@ public class CustomerService {
         return customerRepository.findById(id);
     }
 
+    @CacheEvict(value = "customers", allEntries = true)
     public Customer createCustomer(Customer customer) {
         log.info("inside createCustomer");
         return customerRepository.save(customer);
@@ -96,6 +98,7 @@ public class CustomerService {
      * Partial update: only the non-null fields of {@code changes} are applied.
      * Returns an empty Optional when no customer exists with the given id.
      */
+    @CacheEvict(value = "customers", allEntries = true)
     public Optional<Customer> updateCustomer(String id, Customer changes) {
         log.info("inside updateCustomer");
         return customerRepository.findById(id).map(existing -> {
@@ -110,6 +113,7 @@ public class CustomerService {
     }
 
     /** Returns {@code false} when no customer exists with the given id. */
+    @CacheEvict(value = "customers", allEntries = true)
     public boolean deleteCustomer(String id) {
         log.info("inside deleteCustomer");
         if (!customerRepository.existsById(id)) {
