@@ -8,10 +8,16 @@ import com.example.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,5 +52,37 @@ public class CustomerController {
     @GetMapping("/throw-exception")
     public ResponseEntity<String> globalExceptionTest() {
         throw new BadRequestException("Missing required parameter: id");
+    }
+
+    @GetMapping("/id/{customerId}")
+    public ResponseEntity<Customer> getCustomerById(@PathVariable String customerId) {
+        Customer customer = customerService.getCustomer(customerId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Customer not found with id " + customerId));
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        Customer created = customerService.createCustomer(customer);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/id/{customerId}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable String customerId,
+                                                   @RequestBody Customer changes) {
+        Customer updated = customerService.updateCustomer(customerId, changes)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Customer not found with id " + customerId));
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/id/{customerId}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable String customerId) {
+        if (!customerService.deleteCustomer(customerId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Customer not found with id " + customerId);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
