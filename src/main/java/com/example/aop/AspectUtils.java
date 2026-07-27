@@ -11,7 +11,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 @Aspect
 public class AspectUtils {
 
-    @Around("execution(* com.example.service.CustomerService.getAllCustomers(..)))")
+    @Around("execution(* com.example.service.CustomerService.getAllCustomers(..))")
     public Object executionTime(ProceedingJoinPoint point) throws Throwable {
         long startTime = System.currentTimeMillis();
         Object object = point.proceed();

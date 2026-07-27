@@ -54,10 +54,7 @@ public class CustomerService {
         log.info("from config => "+ config.getJsonPlaceholderUrl() + config.getBaseUrl() + config.getPath());
 
         var customers = customerRepository.findAll();
-        var multiLineMessage = """
-                customers => { customers }
-            """;
-        log.info(multiLineMessage);
+        log.info("customers => {}", customers);
         return customers;
     }
 
