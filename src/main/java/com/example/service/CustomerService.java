@@ -82,6 +82,43 @@ public class CustomerService {
         }
     }
 
+    public Optional<Customer> getCustomer(String id) {
+        log.info("inside getCustomer");
+        return customerRepository.findById(id);
+    }
+
+    public Customer createCustomer(Customer customer) {
+        log.info("inside createCustomer");
+        return customerRepository.save(customer);
+    }
+
+    /**
+     * Partial update: only the non-null fields of {@code changes} are applied.
+     * Returns an empty Optional when no customer exists with the given id.
+     */
+    public Optional<Customer> updateCustomer(String id, Customer changes) {
+        log.info("inside updateCustomer");
+        return customerRepository.findById(id).map(existing -> {
+            if (changes.getFirstName() != null) {
+                existing.setFirstName(changes.getFirstName());
+            }
+            if (changes.getLastName() != null) {
+                existing.setLastName(changes.getLastName());
+            }
+            return customerRepository.save(existing);
+        });
+    }
+
+    /** Returns {@code false} when no customer exists with the given id. */
+    public boolean deleteCustomer(String id) {
+        log.info("inside deleteCustomer");
+        if (!customerRepository.existsById(id)) {
+            return false;
+        }
+        customerRepository.deleteById(id);
+        return true;
+    }
+
     @Async
     public CompletableFuture<String> asyncTest() {
         return CompletableFuture.completedFuture("");
